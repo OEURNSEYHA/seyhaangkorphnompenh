@@ -1,12 +1,9 @@
-const userController = require('../controller/userController')
+const userController = require("../controller/userController");
+const router = require("express").Router();
+const multer = require("multer");
+const upload = multer();
+router.get("/users", userController.get);
 
- const router = require('express').Router()
+router.post("/user/register",upload.none(), userController.register);
 
-
-router.get('/users' , userController.get)
-
-router.get('/another-route' , (req , res)=>{
-    // router code here
-})
-
-module.exports  = router
+module.exports = router;
