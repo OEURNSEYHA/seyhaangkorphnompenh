@@ -4,10 +4,16 @@ const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 require("dotenv").config();
 
-const { JWT_SECRET, ACCESS_TOKEN_EXPIRATION } = process.env;
+const { JWT_SECRET, ACCESS_TOKEN_EXPIRATION, REFRESH_TOKEN_EXPIRATION  } = process.env;
 const createToken = (email, fullname) =>{
   return jwt.sign({ email, fullname}, JWT_SECRET, {
     expiresIn: ACCESS_TOKEN_EXPIRATION,
+  })
+}
+
+const createRefreshToken = (email, fullname) => {
+  return jwt.sign({email, fullname }, JWT_SECRET, {
+    expiresIn: REFRESH_TOKEN_EXPIRATION
   })
 }
 
@@ -56,9 +62,10 @@ const userController = {
       const Matchpassword = await bcrypt.compare(password, users.password);
       if (!Matchpassword) return res.json({ message: "password invalid" });
     // create token
-      const token = createToken(user.email, user.fullname)
+      const token = createToken(user.email, user.fullname);
+      const refreshToken = createRefreshToken(user.email, user.fullname);
   
-      res.json({ token });
+      res.json({ token: token, refreshToken: refreshToken});
     } catch (err) {
       res.status(401).json({ error: err.message });
     }
