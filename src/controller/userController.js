@@ -5,17 +5,17 @@ const jwt = require("jsonwebtoken");
 require("dotenv").config();
 
 const { JWT_SECRET, ACCESS_TOKEN_EXPIRATION, REFRESH_TOKEN_EXPIRATION  } = process.env;
-const createToken = (email, fullname) =>{
-  return jwt.sign({ email, fullname}, JWT_SECRET, {
+const createToken = (_id,email,password) =>{
+  return jwt.sign({ _id,email, password }, JWT_SECRET, {
     expiresIn: ACCESS_TOKEN_EXPIRATION,
   })
 }
 
-const createRefreshToken = (email, fullname) => {
-  return jwt.sign({email, fullname }, JWT_SECRET, {
-    expiresIn: REFRESH_TOKEN_EXPIRATION
-  })
-}
+// const createRefreshToken = (email) => {
+//   return jwt.sign({email }, JWT_SECRET, {
+//     expiresIn: REFRESH_TOKEN_EXPIRATION
+//   })
+// }
 
 const userController = {
   get: async (req, res) => {
@@ -61,11 +61,12 @@ const userController = {
       if (!users) return res.json({ message: "email invalid" });
       const Matchpassword = await bcrypt.compare(password, users.password);
       if (!Matchpassword) return res.json({ message: "password invalid" });
+
     // create token
-      const token = createToken(user.email, user.fullname);
-      const refreshToken = createRefreshToken(user.email, user.fullname);
+      const token = createToken(users._id, users.email ,users.password);
+      // const refreshToken = createRefreshToken(users.email);
   
-      res.json({ token: token, refreshToken: refreshToken});
+      res.json({ token: token});
     } catch (err) {
       res.status(401).json({ error: err.message });
     }
