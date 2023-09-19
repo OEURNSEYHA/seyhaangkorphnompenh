@@ -3,8 +3,8 @@ require("dotenv").config();
 const { JWT_SECRET } = process.env;
 
 const User = require("../model/user");
-
 const requireAuth = async (req, res, next) => {
+
   const { authorization } = req.headers;
 
   if (!authorization) {
