@@ -2,6 +2,7 @@ const { isEmail, isStrongPassword } = require("validator");
 const user = require("../model/user");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
+const { tokenBlacklist } = require("../middleware/tokenBlackList");
 require("dotenv").config();
 
 const { JWT_SECRET, ACCESS_TOKEN_EXPIRATION, REFRESH_TOKEN_EXPIRATION } =
@@ -56,7 +57,6 @@ const userController = {
       if (!users) return res.json({ message: "email invalid" });
       const Matchpassword = await bcrypt.compare(password, users.password);
       if (!Matchpassword) return res.json({ message: "password invalid" });
-
       // create token
       const token = createToken(users._id, users.email, users.password);
       // const refreshToken = createRefreshToken(users.email);
@@ -66,6 +66,17 @@ const userController = {
       res.status(401).json({ error: err.message });
     }
   },
+
+  logout: async (req, res) => {
+    // Logout route
+    const token = req.headers.authorization?.split(" ")[1];
+    console.log(token)
+    if (token) {
+      tokenBlacklist.add(token);
+    }
+    res.json({ message: "Logout successful" });
+  }
+  
 };
 
 module.exports = userController;
