@@ -46,6 +46,7 @@ const userController = {
       });
       res.json(users);
     } catch (err) {
+      
       res.json({ error: err.message });
     }
   },

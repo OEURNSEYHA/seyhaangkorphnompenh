@@ -5,7 +5,7 @@ const  requireAuth   = require("../middleware/authMiddleware");
 const {  BlackListRoute } = require("../middleware/tokenBlackList");
 
 const upload = multer();
-router.get("/users", BlackListRoute, requireAuth,   userController.get );
+router.get("/users", BlackListRoute,requireAuth, userController.get);
 
 router.post("/user/register",upload.none(), userController.register);
 router.post("/user/login",upload.none(), userController.login);
