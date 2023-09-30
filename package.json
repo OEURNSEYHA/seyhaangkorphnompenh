@@ -20,6 +20,9 @@
     "mongoose": "^7.5.2",
     "multer": "^1.4.5-lts.1",
     "nodemon": "^3.0.1",
+    "request": "^2.88.2",
+    "response": "^0.18.0",
+    "swagger": "^0.7.5",
     "validator": "^13.11.0"
   }
 }
