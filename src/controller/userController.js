@@ -2,7 +2,7 @@ const { isEmail, isStrongPassword } = require("validator");
 const user = require("../model/user");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
-const { tokenBlacklist } = require("../middleware/tokenBlackList");
+
 require("dotenv").config();
 
 const { JWT_SECRET, ACCESS_TOKEN_EXPIRATION, REFRESH_TOKEN_EXPIRATION } =
@@ -46,38 +46,44 @@ const userController = {
       });
       res.json(users);
     } catch (err) {
-      
       res.json({ error: err.message });
     }
   },
-
   login: async (req, res) => {
     try {
       const { email, password } = req.body;
       const users = await user.findOne({ email });
-      if (!users) return res.json({ message: "email invalid" });
-      const Matchpassword = await bcrypt.compare(password, users.password);
-      if (!Matchpassword) return res.json({ message: "password invalid" });
-      // create token
-      const token = createToken(users._id, users.email, users.password);
-      // const refreshToken = createRefreshToken(users.email);
 
-      res.json({ token: token });
+      if (!users) {
+        return res.status(401).json({ message: "Email invalid" });
+      }
+      const isPasswordValid = await bcrypt.compare(password, users.password);
+      if (!isPasswordValid) {
+        return res.status(401).json({ message: "Password invalid" });
+      }
+  
+      // Assuming you have a function 'createToken' to generate the access token
+      const token = createToken(users._id, users.email, users.password);
+  
+      // Calculate the expiration time (e.g., 1 hour from now)
+      const expirationTime = new Date();
+      expirationTime.setHours(expirationTime.getHours() + 1); // Adjust the expiration as needed
+  
+      // Set an HttpOnly access token cookie with the correct expiration time
+      res.cookie("accessToken", token, {
+        expires: expirationTime,
+        httpOnly: true,
+        secure: true, // Make sure to set this for HTTPS
+        sameSite: "Strict", // Recommended for added security
+      });
+  
+      res.json({ token });
     } catch (err) {
-      res.status(401).json({ error: err.message });
+      res.status(500).json({ error: err.message }); // Change status to 500 for internal server error
     }
   },
 
-  logout: async (req, res) => {
-    // Logout route
-    const token = req.headers.authorization?.split(" ")[1];
-    console.log(token)
-    if (token) {
-      tokenBlacklist.add(token);
-    }
-    res.json({ message: "Logout successful" });
-  }
+ 
   
-};
-
+}
 module.exports = userController;
