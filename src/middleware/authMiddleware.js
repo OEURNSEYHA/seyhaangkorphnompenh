@@ -10,7 +10,7 @@ const requireAuth = async (req, res, next) => {
     return res.status(401).json({ error: "Authorization token required" });
   }
   const token = authorization.split(" ")[1];
-  
+
   if (!token) {
     return res.status(401).json({ message: "Unauthorized" });
   }
@@ -20,9 +20,11 @@ const requireAuth = async (req, res, next) => {
     req.user = await User.findById({ _id }).select("_id");
     req.user = await User.findOne({ email }).select("_id");
     req.user = await User.findOne({ password }).select("_id");
+    
     if (!req.user) {
       return res.status(404).json({ error: "User not found" });
     }
+
     next();
   } catch (error) {
     res.status(401).json({ error: "Request is not authorized" });

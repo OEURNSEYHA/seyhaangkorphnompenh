@@ -61,14 +61,13 @@ const userController = {
       if (!isPasswordValid) {
         return res.status(401).json({ message: "Password invalid" });
       }
-  
+
       // Assuming you have a function 'createToken' to generate the access token
       const token = createToken(users._id, users.email, users.password);
-  
+
       // Calculate the expiration time (e.g., 1 hour from now)
       const expirationTime = new Date();
       expirationTime.setHours(expirationTime.getHours() + 1); // Adjust the expiration as needed
-  
       // Set an HttpOnly access token cookie with the correct expiration time
       res.cookie("accessToken", token, {
         expires: expirationTime,
@@ -76,14 +75,11 @@ const userController = {
         secure: true, // Make sure to set this for HTTPS
         sameSite: "Strict", // Recommended for added security
       });
-  
+
       res.json({ token });
     } catch (err) {
       res.status(500).json({ error: err.message }); // Change status to 500 for internal server error
     }
   },
-
- 
-  
-}
+};
 module.exports = userController;
